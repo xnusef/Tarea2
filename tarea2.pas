@@ -55,9 +55,55 @@ begin
         end;
 end;
 
-procedure disparar(b: TBalin; frontera: TSecPelotas; zona:TZonaPelotas; var indicePelota: TIndicePelota; var chocaFrontera: boolean);
+procedure obtenerPelotaConIndice(indice : TIndicePelota, zona : TZonaPelotas; var pelotaDevuelta : TPelota);
+var 
+    i, iAux : RangoFilas;
+    j, jAux : RangoColumnas;
+    encontrado : boolean;
 begin
-    
+
+    iAux := 1;
+    jAux := 1;
+
+    for i := 1 to CANT_FILAS do
+        for j := 1 to CANT_COLUMNAS do
+            if indice.i = i && indice.j = j then
+            begin
+                iAux := i;
+                jAux := j;
+            end;
+        
+    pelotaDevuelta := zona[iAux, jAux].pelota 
+end;
+
+procedure disparar(b: TBalin; frontera: TSecPelotas; zona:TZonaPelotas; var indicePelota: TIndicePelota; var chocaFrontera: boolean);
+{precondicion, todos los indices de la frontera estan ocupados}
+type
+    rangoCantPelotas : 1..CANT_PELOTAS;
+var 
+    chocan : boolean;
+    i : rangoCantPelotas;
+    pelotaDevuelta : TPelota;
+begin
+    chocan := false;
+    darUnPaso(b);
+
+    while (! chocan) && (! b.pelota.posicion.y - RADIO < 1) do
+    begin
+        i := 1;
+        darUnPaso(b);
+        for i to frontera.tope do
+        begin
+            obtenerPelotaConIndice(frontera.sec[i], zona, pelotaDevuelta);
+            chocan := estanChocando(b.pelota, pelotaDevuelta);
+            if chocan && pelotaDevuelta.color = b.pelota.color then
+                indicePelota := frontera.sec[i];
+                chocan := true
+        end;
+        darUnPaso(b);
+    end;
+
+    chocaFrontera := chocan
 end;
 
 procedure eliminarPelotas(var zonaPelotas: TZonaPelotas; aEliminar: TSecPelotas);
@@ -66,6 +112,20 @@ begin
 end;
 
 function esZonaVacia(zonaPelotas: TZonaPelotas): boolean;
+var 
+    vacia : boolean;
+    i : RangoFilas + 1;
+    j : RangoColumnas;
 begin
+    i := 1;
+    vacia := true;
+
+    while vacia && i <= RangoFilas do
+        for j := 1 to CANT_COLUMNAS do
+            if zonaPelotas[i, j].ocupada then
+                vacia := false;
+        i := i + 1
+    end;
     
+    esZonaVacia := vacia
 end;
