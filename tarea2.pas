@@ -107,8 +107,13 @@ begin
 end;
 
 procedure eliminarPelotas(var zonaPelotas: TZonaPelotas; aEliminar: TSecPelotas);
+var i,j, k : integer;
 begin
-    
+    for i := 1 to CANT_FILAS do
+        for j := 1 to CANT_COLUMNAS do
+            for k := 1 to aEliminar.tope do
+                if (zonaPelotas[i,j].ocupada) AND (aEliminar.sec[k].i = i) AND (aEliminar.sec[k].j = j)  then
+                    zonaPelotas[i,j].ocupada := false;
 end;
 
 function esZonaVacia(zonaPelotas: TZonaPelotas): boolean;
