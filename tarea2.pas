@@ -95,7 +95,6 @@ begin
 end;
 
 procedure disparar(b: TBalin; frontera: TSecPelotas; zona:TZonaPelotas; var indicePelota: TIndicePelota; var chocaFrontera: boolean);
-{precondicion, todos los indices de la frontera estan ocupados}
 type
     rangoCantPelotas = 1..CANT_PELOTAS;
 var 
