@@ -1,6 +1,6 @@
 TRUE (4,1)
-TRUE (4,8)
-TRUE (4,2)
+TRUE (3,8)
+TRUE (4,1)
 TRUE (4,1)
 TRUE (4,8)
 FALSE 

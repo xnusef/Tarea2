@@ -113,12 +113,12 @@ begin
         begin
             obtenerPelotaConIndice(frontera.sec[i], zona, pelotaDevuelta);
             chocan := (estanChocando(b.pelota, pelotaDevuelta));
-            chocaron := chocan OR chocaron;
-            if chocan AND (b.pelota.color = pelotaDevuelta.color) then
+            if chocan AND (b.pelota.color = pelotaDevuelta.color) AND not(chocaron) then
             begin
                 indicePelota := frontera.sec[i];
                 chocanMismoColor := true   
             end;    
+            chocaron := chocan OR chocaron;
         end;        
     until (chocaron) OR (b.pelota.posicion.y - RADIO < 1);
     
