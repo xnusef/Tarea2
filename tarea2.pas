@@ -14,52 +14,70 @@ end;
 
 function calcularDistancia(pos1, pos2 : TPelota): real;
 begin
-    calcularDistancia := sqrt(sqr(pos1.x - pos2.x) + sqr(pos1.y - pos2.y))
+    calcularDistancia := sqrt(sqr(pos1.posicion.x - pos2.posicion.x) + sqr(pos1.posicion.y - pos2.posicion.y))
 end;
 
 function estanChocando(p1, p2: TPelota): boolean;
 var 
     distancia : real;
 begin
-    distancia := calcularDistancia(p1.posicion, p2.posicion);
+    distancia := calcularDistancia(p1, p2);
     estanChocando := distancia < (RADIO * 2)
 end;
 
 function esFrontera(indicePelota: TIndicePelota; zonaPelotas: TZonaPelotas): boolean;
-var tieneVecinos : boolean;
-begin 
-    tieneVecinos := false;
-    if zonapelotas[indicePelota.i, indicePelota.j].ocupada = true then
-        if (indicePelota.i = 1) OR (indicePelota.i = CANT_FILAS) OR (indicePelota.j = 1) OR (indicePelota.i = CANT_COLUMNAS)
+var frontera : boolean;
+    k : integer;
+begin
+    frontera := false;
+    if (zonaPelotas[indicePelota.i, indicePelota.j].ocupada) then
+    begin
+        frontera := (indicePelota.i = 1) OR (indicePelota.i = CANT_FILAS) OR (indicePelota.j = 1) OR (indicePelota.j = CANT_COLUMNAS);
+        if not (frontera) then
             with indicePelota do
-                tieneVecinos := zonaPelotas[i + 1, j + 1].ocupada OR zonaPelotas[i + 1, j - 1].ocupada OR zonaPelotas[i - 1, j + 1].ocupada OR zonaPelotas[i - 1, j - 1].ocupada;
-    esFrontera := tieneVecinos;
+            begin
+                for k := -1 to 1 do
+                    if (k <> 0) AND ((i + k) >= 1) AND ((i + k) <= CANT_FILAS) then
+                        frontera := frontera OR not (zonaPelotas[i + k, j].ocupada);
+                for k := -1 to 1 do
+                    if (k <> 0) AND ((j + k) >= 1) AND ((j + k) <= CANT_COLUMNAS) then
+                        frontera := frontera OR not (zonaPelotas[i, j + k].ocupada);
+            end;  
+    end;  
+
+    esFrontera := frontera;
 end;
 
 procedure obtenerFrontera(zonaPelotas: TZonaPelotas; var frontera: TSecPelotas);
-var indicesPelotas : TIndicePelota;
-    esFrontera : boolean;
-    contador : int;
+var indicePelotas : TIndicePelota;
+    esFronteraFlag : boolean;
+    // contador : integer;
+    i,j : integer;
 begin
     frontera.tope := 0;
-    for indicePelotas.i := 1 to CANT_COLUMNAS do
-        for indicePelotas.j := 1 to CANT_FILAS do
+    for i := 1 to CANT_COLUMNAS do
+        for j := 1 to CANT_FILAS do
         begin
-            esFrontera := esFrontera(indicePelotas, zonaPelotas);
-            if esFrontera = true then
+            indicePelotas.i := i;
+            indicePelotas.j := j;
+            esFronteraFlag := esFrontera(indicePelotas, zonaPelotas);
+            if esFronteraFlag = true then
                 with frontera do
                 begin
-                    sec[tope] := indicePelotas;
-                    tope := tope + 1
+                    if (tope + 1) <= CANT_PELOTAS then
+                    begin
+                        tope := tope + 1;
+                        sec[tope] := indicePelotas;
+                    end;
                 end;
         end;
 end;
 
-procedure obtenerPelotaConIndice(indice : TIndicePelota, zona : TZonaPelotas; var pelotaDevuelta : TPelota);
+
+procedure obtenerPelotaConIndice(indice : TIndicePelota ; zona : TZonaPelotas; var pelotaDevuelta : TPelota);
 var 
     i, iAux : RangoFilas;
     j, jAux : RangoColumnas;
-    encontrado : boolean;
 begin
 
     iAux := 1;
@@ -67,7 +85,7 @@ begin
 
     for i := 1 to CANT_FILAS do
         for j := 1 to CANT_COLUMNAS do
-            if indice.i = i && indice.j = j then
+            if (indice.i = i) AND (indice.j = j) then
             begin
                 iAux := i;
                 jAux := j;
@@ -79,31 +97,32 @@ end;
 procedure disparar(b: TBalin; frontera: TSecPelotas; zona:TZonaPelotas; var indicePelota: TIndicePelota; var chocaFrontera: boolean);
 {precondicion, todos los indices de la frontera estan ocupados}
 type
-    rangoCantPelotas : 1..CANT_PELOTAS;
+    rangoCantPelotas = 1..CANT_PELOTAS;
 var 
-    chocan : boolean;
+    chocan, chocaron, chocanMismoColor: boolean;
     i : rangoCantPelotas;
     pelotaDevuelta : TPelota;
 begin
     chocan := false;
-    darUnPaso(b);
+    chocaron := false;
+    chocanMismoColor := false;
 
-    while (! chocan) && (! b.pelota.posicion.y - RADIO < 1) do
-    begin
-        i := 1;
+    repeat;        
         darUnPaso(b);
-        for i to frontera.tope do
+        for i := 1 to frontera.tope do
         begin
             obtenerPelotaConIndice(frontera.sec[i], zona, pelotaDevuelta);
-            chocan := estanChocando(b.pelota, pelotaDevuelta);
-            if chocan && pelotaDevuelta.color = b.pelota.color then
+            chocan := (estanChocando(b.pelota, pelotaDevuelta));
+            chocaron := chocan OR chocaron;
+            if chocan AND (b.pelota.color = pelotaDevuelta.color) then
+            begin
                 indicePelota := frontera.sec[i];
-                chocan := true
-        end;
-        darUnPaso(b);
-    end;
-
-    chocaFrontera := chocan
+                chocanMismoColor := true   
+            end;    
+        end;        
+    until (chocaron) OR (b.pelota.posicion.y - RADIO < 1);
+    
+    chocaFrontera := chocanMismoColor;
 end;
 
 procedure eliminarPelotas(var zonaPelotas: TZonaPelotas; aEliminar: TSecPelotas);
@@ -119,18 +138,17 @@ end;
 function esZonaVacia(zonaPelotas: TZonaPelotas): boolean;
 var 
     vacia : boolean;
-    i : RangoFilas + 1;
+    i : 1..(CANT_FILAS+1);
     j : RangoColumnas;
 begin
     i := 1;
     vacia := true;
-
-    while vacia && i <= RangoFilas do
+    repeat
         for j := 1 to CANT_COLUMNAS do
             if zonaPelotas[i, j].ocupada then
                 vacia := false;
         i := i + 1
-    end;
+    until (not (vacia)) OR (i > CANT_FILAS);
     
     esZonaVacia := vacia
 end;
