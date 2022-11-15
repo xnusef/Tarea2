@@ -205,7 +205,7 @@ de la zona de pelotas (tal como está definida en `definiciones.pas`).
 Se utilizan los siguientes caracteres para representar las celdas:
 
 - `M` - Una celda ocupada por una pelota *verde*.
-- `b` - Una celda ocupada por una peolta *azul*.
+- `b` - Una celda ocupada por una pelota *azul*.
 - `r` - Una celda ocupada por una pelota *roja*.
 - `.` - Una celda no ocupada.
 
