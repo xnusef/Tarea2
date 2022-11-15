@@ -101,6 +101,7 @@ var
     chocan, chocaron, chocanMismoColor: boolean;
     i : rangoCantPelotas;
     pelotaDevuelta : TPelota;
+    indicePelotaAux : TIndicePelota;
 begin
     chocan := false;
     chocaron := false;
@@ -114,13 +115,14 @@ begin
             chocan := (estanChocando(b.pelota, pelotaDevuelta));
             if chocan AND (b.pelota.color = pelotaDevuelta.color) AND not(chocaron) then
             begin
-                indicePelota := frontera.sec[i];
+                indicePelotaAux := frontera.sec[i];
                 chocanMismoColor := true   
             end;    
             chocaron := chocan OR chocaron;
         end;        
     until (chocaron) OR (b.pelota.posicion.y - RADIO < 1);
     
+    indicePelota := indicePelotaAux;
     chocaFrontera := chocanMismoColor;
 end;
 
