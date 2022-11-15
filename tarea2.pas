@@ -51,7 +51,6 @@ end;
 procedure obtenerFrontera(zonaPelotas: TZonaPelotas; var frontera: TSecPelotas);
 var indicePelotas : TIndicePelota;
     esFronteraFlag : boolean;
-    // contador : integer;
     i,j : integer;
 begin
     frontera.tope := 0;
@@ -112,7 +111,7 @@ begin
         begin
             obtenerPelotaConIndice(frontera.sec[i], zona, pelotaDevuelta);
             chocan := (estanChocando(b.pelota, pelotaDevuelta));
-            if chocan AND (b.pelota.color = pelotaDevuelta.color) AND not(chocaron) then
+            if chocan AND (b.pelota.color = pelotaDevuelta.color) AND not(chocanMismoColor) then
             begin
                 indicePelota := frontera.sec[i];
                 chocanMismoColor := true   
