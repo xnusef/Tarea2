@@ -4,6 +4,8 @@
 ##    wish principal.tcl
 ##    wish principal.tcl mac
 
+## Esta versión para Windows NO PERMITE usar WRITE(stderr,...) para debugging
+
 ## Para debugging usando WRITEs en el .PAS usando la interfaz es necesario
 ## usar la salida de error estándar. En los archivos .PAS debe escribir:
 ## WRITE (stderr, arg1, arg2, .... argN)
@@ -26,7 +28,8 @@ set archivo ""                            ; # Archivo con zona de pelotas
 proc config {} {
     wm title . "Tarea 2"
     wm protocol . WM_DELETE_WINDOW cerrarPascal
-    set ::io [open "|$::ejecutable IF 2>/dev/tty" r+]
+    set ::io [open "|$::ejecutable IF" r+]
+###    set ::io [open "|$::ejecutable IF 2>/dev/tty" r+]
     fconfigure $::io -buffering line
 }
 
